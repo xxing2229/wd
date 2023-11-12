@@ -12,21 +12,22 @@ jobs:
 
     - name: Set up QEMU and dependencies
       run: |
+        lscpu
         sudo apt update -y
-        sudo apt install qemu-kvm novnc -y
+        sudo apt install qemu-kvm novnc -y 
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok -y
         ngrok authtoken 2MwTQ2vL3WGT7QSnd9QcBD3eE7D_S8T2mYhRs4KnCR7aQKmk
         
-        wget -O virtio-win.iso 'https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win.iso'
+        wget -O virtio-win.iso -q 'https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win.iso'
         sudo adduser $USER kvm
         qemu-img create -f raw windows.img 200G
 
     - name: Download Windows ISO
-      run: wget -O windows.iso 'https://go.microsoft.com/fwlink/p/?LinkID=2195167&clcid=0x409&culture=en-us&country=US'
+      run: wget -O windows.iso -q 'https://go.microsoft.com/fwlink/p/?LinkID=2195167&clcid=0x409&culture=en-us&country=US'
 
     - name: Run QEMU
       run: |
         sudo /usr/share/novnc/utils/launch.sh --listen 8089 --vnc localhost:5902 &>/dev/null &
-        ngrok http 8089 &>/dev/null
+        ngrok http 8089 --region=jp &>/dev/null &
         sudo qemu-system-x86_64 -m 8G -cpu max -drive file=windows.img,format=raw,if=virtio -device virtio-net-pci,netdev=net0 -netdev user,id=net0,hostfwd=tcp::3389-:3389 -device usb-ehci,id=usb,bus=pci.0,addr=0x4 -device usb-tablet -vnc :2 -enable-kvm -cdrom windows.iso -drive file=virtio-win.iso,media=cdrom
 
