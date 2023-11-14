@@ -29,5 +29,5 @@ jobs:
       run: |
         sudo /usr/share/novnc/utils/launch.sh --listen 8089 --vnc localhost:5902 &>/dev/null &
         ngrok http 8089 --region=jp &>/dev/null &
-        sudo qemu-system-x86_64 -m 8G -cpu max -drive file=windows.img,format=raw,if=virtio -device virtio-net-pci,netdev=net0 -netdev user,id=net0,hostfwd=tcp::3389-:3389 -device usb-ehci,id=usb,bus=pci.0,addr=0x4 -device usb-tablet -vnc :2 -enable-kvm -cdrom windows.iso -drive file=virtio-win.iso,media=cdrom
+        sudo qemu-system-x86_64 -m 4G -cpu max -drive file=windows.img,format=raw,if=virtio -device virtio-net-pci,netdev=net0 -netdev user,id=net0,hostfwd=tcp::3389-:3389 -device usb-ehci,id=usb,bus=pci.0,addr=0x4 -device usb-tablet -vnc :2 -cdrom windows.iso -drive file=virtio-win.iso,media=cdrom
 
